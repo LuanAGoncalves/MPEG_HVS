@@ -302,7 +302,6 @@ class Encoder:
 #        Method: genHVStables(self)-> tables \n
 #        About: Generates matrices of perceptual quantization. \n
 #        """
-#        min_value, max_value = self.Z.min(), self.Z.max()
 #        tables = [[0 for x in range (self.sspace+1)] for x in range (self.sspace+1)]
 #        g = [[0 for x in range (self.sspace+1)] for x in range (self.sspace+1)]
 #        qflat = self.flat*np.ones((8,8), float)
@@ -345,9 +344,13 @@ class Encoder:
         Method: genHVStables(self)-> tables \n
         About: Generates matrices of perceptual quantization. \n
         """
-        min_value, max_value = self.Z.min(), self.Z.max()
+        if self.quality <= 70:
+            max_value = self.Z.max()
+        else:
+            max_value = 119.9
         tables = [[0 for x in range (self.sspace+1)] for x in range (self.sspace+1)]
         g = [[0 for x in range (self.sspace+1)] for x in range (self.sspace+1)]
+        min_value = 10.6577596664+234.260803223*0.859902977943**(self.quality)
         qflat = min_value*np.ones((8,8), float)
         for mh in range (self.sspace+1):
             for mt in range (self.sspace+1):
@@ -379,6 +382,7 @@ class Encoder:
                         qhvs[i,j] = ((mh+mt)/float(self.p))*(1.-(g[mh,mt,i,j]/gmax))
                 q = (qflat + qhvs)
                 tables[mh][mt] = ((q/np.linalg.norm(q))*(max_value-min_value))+min_value
+#                tables[mh][mt] = q
                 
         self.hvstables = tables
         
@@ -427,7 +431,7 @@ class Encoder:
                 for j in range (vecsz):
                     if bframe.motionVec[j][1] == 'i':
                         if self.hvsqm == 1:
-                            MV[j] = ( int(np.floor((abs(bframe.motionVec[j][2])+abs(bframe.motionVec[j][4]))/2.)) , int(np.floor((abs(bframe.motionVec[j][3])+abs(bframe.motionVec[j][5]))/2.) ))
+                            MV[j] = (abs(bframe.motionVec[j][2]), abs(bframe.motionVec[j][3]), abs(bframe.motionVec[j][4]), abs(bframe.motionVec[j][5]))
                     else:
                         if self.hvsqm == 1:
                             MV[j] = ( abs(bframe.motionVec[j][2]), abs(bframe.motionVec[j][3]) )
@@ -937,11 +941,9 @@ class Decoder:
 #        Method: genHVStables(self)-> tables \n
 #        About: Generates matrices of perceptual quantization. \n
 #        """
-#        min_value, min_value = self.Z.min(), self.Z.max()
 #        tables = [[0 for x in range (int(self.sspace)+1)] for x in range (int(self.sspace)+1)]
 #        g = [[0 for x in range (int(self.sspace)+1)] for x in range (int(self.sspace)+1)]
 #        qflat = float(self.flat)*np.ones((8,8), np.float32)
-##        print qflat
 #        for mh in range (int(self.sspace)+1):
 #            for mt in range (int(self.sspace)+1):
 #                
@@ -982,10 +984,14 @@ class Decoder:
         Method: genHVStables(self)-> tables \n
         About: Generates matrices of perceptual quantization. \n
         """
-        min_value, max_value = self.Z.min(), self.Z.max()
+        if self.quality <= 70:
+            max_value = self.Z.max()
+        else:
+            max_value = 119.9
         tables = [[0 for x in range (int(self.sspace)+1)] for x in range (int(self.sspace)+1)]
         g = [[0 for x in range (int(self.sspace)+1)] for x in range (int(self.sspace)+1)]
-        qflat = float(min_value)*np.ones((8,8), np.float32)
+        min_value = 10.6577596664+234.260803223*0.859902977943**(self.quality)
+        qflat = min_value*np.ones((8,8), float)
 #        print qflat
         for mh in range (int(self.sspace)+1):
             for mt in range (int(self.sspace)+1):
@@ -1019,6 +1025,7 @@ class Decoder:
                         qhvs[i,j] = ((mh+mt)/float(self.p))*(1.-(g[mh,mt,i,j]/gmax))
                 q = (qflat + qhvs)
                 tables[mh][mt] = ((q/np.linalg.norm(q))*(max_value-min_value))+min_value
+#                tables[mh][mt] = q
                 
         self.hvstables = tables
         

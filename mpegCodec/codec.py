@@ -350,8 +350,9 @@ class Encoder:
             max_value = 119.9
         tables = [[0 for x in range (self.sspace+1)] for x in range (self.sspace+1)]
         g = [[0 for x in range (self.sspace+1)] for x in range (self.sspace+1)]
-        min_value = 10.6577596664+234.260803223*0.859902977943**(self.quality)
-        qflat = min_value*np.ones((8,8), float)
+#        min_value = 10.6577596664+234.260803223*0.859902977943**(self.quality)
+#        qflat = min_value*np.ones((8,8), float)
+        qflat = self.flat*np.ones((8,8), float)
         for mh in range (self.sspace+1):
             for mt in range (self.sspace+1):
                 vh = float(mh*self.fps)/float(self.oR)
@@ -381,8 +382,13 @@ class Encoder:
                     for j in range (8):
                         qhvs[i,j] = ((mh+mt)/float(self.p))*(1.-(g[mh,mt,i,j]/gmax))
                 q = (qflat + qhvs)
-                tables[mh][mt] = ((q/np.linalg.norm(q))*(max_value-min_value))+min_value
+                q_hvs_mean = np.mean(q)
+                q_hvs_std = np.std(q)
+                q_mean = np.mean(self.Z)
+                q_std = np.std(self.Z)
+#                tables[mh][mt] = ((q/np.linalg.norm(q))*(max_value-min_value))+min_value
 #                tables[mh][mt] = q
+                tables[mh][mt] = (((qflat + qhvs)- q_hvs_mean)/q_hvs_std)*q_std + q_mean
                 
         self.hvstables = tables
         
@@ -990,8 +996,9 @@ class Decoder:
             max_value = 119.9
         tables = [[0 for x in range (int(self.sspace)+1)] for x in range (int(self.sspace)+1)]
         g = [[0 for x in range (int(self.sspace)+1)] for x in range (int(self.sspace)+1)]
-        min_value = 10.6577596664+234.260803223*0.859902977943**(self.quality)
-        qflat = min_value*np.ones((8,8), float)
+#        min_value = 10.6577596664+234.260803223*0.859902977943**(self.quality)
+#        qflat = min_value*np.ones((8,8), float)
+        qflat = self.flat*np.ones((8,8), float)
 #        print qflat
         for mh in range (int(self.sspace)+1):
             for mt in range (int(self.sspace)+1):
@@ -1024,8 +1031,13 @@ class Decoder:
                     for j in range (8):
                         qhvs[i,j] = ((mh+mt)/float(self.p))*(1.-(g[mh,mt,i,j]/gmax))
                 q = (qflat + qhvs)
-                tables[mh][mt] = ((q/np.linalg.norm(q))*(max_value-min_value))+min_value
+                q_hvs_mean = np.mean(q)
+                q_hvs_std = np.std(q)
+                q_mean = np.mean(self.Z)
+                q_std = np.std(self.Z)
+#                tables[mh][mt] = ((q/np.linalg.norm(q))*(max_value-min_value))+min_value
 #                tables[mh][mt] = q
+                tables[mh][mt] = (((qflat + qhvs)- q_hvs_mean)/q_hvs_std)*q_std + q_mean
                 
         self.hvstables = tables
         

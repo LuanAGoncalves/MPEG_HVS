@@ -76,14 +76,7 @@ class Encoder:
                         if len(self.MV[vec_index]) == 2:
                             Z = self.Zhvs[ int(abs(self.MV[vec_index][0])) ][ int(abs(self.MV[vec_index][1])) ] 
                         elif len(self.MV[vec_index]) == 4:
-                            Z1 = self.Zhvs[ int(abs(self.MV[vec_index][0])) ][ int(abs(self.MV[vec_index][1])) ] 
-                            Z2 = self.Zhvs[ int(abs(self.MV[vec_index][2])) ][ int(abs(self.MV[vec_index][3])) ] 
-                            mv1 = np.linalg.norm( [self.MV[vec_index][0], self.MV[vec_index][1]])
-                            mv2 = np.linalg.norm( [self.MV[vec_index][2], self.MV[vec_index][3]])
-                            if mv1 == 0.0 and mv2 == 0.0:
-                                Z = self.Zhvs[ int(abs(self.MV[vec_index][0])) ][ int(abs(self.MV[vec_index][1])) ] 
-                            else:
-                                Z = np.floor(((mv1/float(mv1+mv2))*Z1)+((mv2/float(mv1+mv2))*Z2))
+                            Z = self.Zhvs[ int((abs(self.MV[vec_index][0])+abs(self.MV[vec_index][2]))/2.) ][ int((abs(self.MV[vec_index][1])+abs(self.MV[vec_index][3]))/2.) ] 
                 #    QUANTIZAÇÃO/LIMIARIZAÇÃO
                         zcoefs = np.round( coefs/Z )      #Coeficientes normalizados - ^T(u,v)=arred{T(u,v)/Z(u,v)}
                 #    CODIFICAÇÃO - Codigos de Huffman
@@ -140,14 +133,7 @@ class Encoder:
                         if len(self.MV[vec_index]) == 2:
                             Z = self.Zhvs[ int(abs(self.MV[vec_index][0])) ][ int(abs(self.MV[vec_index][1])) ] 
                         elif len(self.MV[vec_index]) == 4:
-                            Z1 = self.Zhvs[ int(abs(self.MV[vec_index][0])) ][ int(abs(self.MV[vec_index][1])) ] 
-                            Z2 = self.Zhvs[ int(abs(self.MV[vec_index][2])) ][ int(abs(self.MV[vec_index][3])) ] 
-                            mv1 = np.linalg.norm( [self.MV[vec_index][0], self.MV[vec_index][1]])
-                            mv2 = np.linalg.norm( [self.MV[vec_index][2], self.MV[vec_index][3]])
-                            if mv1 == 0.0 and mv2 == 0.0:
-                                Z = self.Zhvs[ int(abs(self.MV[vec_index][0])) ][ int(abs(self.MV[vec_index][1])) ] 
-                            else:
-                                Z = np.floor(((mv1/float(mv1+mv2))*Z1)+((mv2/float(mv1+mv2))*Z2))
+                            Z = self.Zhvs[ int((abs(self.MV[vec_index][0])+abs(self.MV[vec_index][2]))/2.) ][ int((abs(self.MV[vec_index][1])+abs(self.MV[vec_index][3]))/2.) ] 
                 #    QUANTIZAÇÃO/LIMIARIZAÇÃO
                         zcoefs = np.round( coefs/Z )      #Coeficientes normalizados - ^T(u,v)=arred{T(u,v)/Z(u,v)}
                 #    CODIFICAÇÃO - Codigos de Huffman - FOWARD HUFF
@@ -243,14 +229,7 @@ class Decoder:
                         elif len(self.motionVec[vec_index]) == 3:
                             Z = self.hvstables[abs(self.motionVec[vec_index][1])][abs(self.motionVec[vec_index][2])]
                         else:
-                            Z1 = self.hvstables[int((abs(self.motionVec[vec_index][1])))][int((abs(self.motionVec[vec_index][2])))]
-                            Z2 = self.hvstables[int((abs(self.motionVec[vec_index][3])))][int((abs(self.motionVec[vec_index][4])))]
-                            mv1 = np.linalg.norm( [self.motionVec[vec_index][1], self.motionVec[vec_index][2]])
-                            mv2 = np.linalg.norm( [self.motionVec[vec_index][3], self.motionVec[vec_index][4]])
-                            if mv1 == 0.0 and mv2 == 0.0:
-                                Z = self.hvstables[int((abs(self.motionVec[vec_index][1])))][int((abs(self.motionVec[vec_index][2])))]
-                            else:
-                                Z = np.floor(((mv1/float(mv1+mv2))*Z1)+((mv2/float(mv1+mv2))*Z2))
+                            Z = self.hvstables[int((abs(self.motionVec[vec_index][1])+abs(self.motionVec[vec_index][3]))/2.)][int((abs(self.motionVec[vec_index][2])+abs(self.motionVec[vec_index][4]))/2.)]
       
                         blk = h.zagzig(seqrec[i*self.nBlkCols + j])
                         self.imRaw[r*i:r*i+r, c*j:c*j+c, ch] = np.round_( cv2.idct( blk*Z ))
@@ -297,14 +276,7 @@ class Decoder:
                         elif len(self.motionVec[vec_index]) == 3:
                             Z = self.hvstables[abs(self.motionVec[vec_index][1])][abs(self.motionVec[vec_index][2])]
                         else:
-                            Z1 = self.hvstables[int((abs(self.motionVec[vec_index][1])))][int((abs(self.motionVec[vec_index][2])))]
-                            Z2 = self.hvstables[int((abs(self.motionVec[vec_index][3])))][int((abs(self.motionVec[vec_index][4])))]
-                            mv1 = np.linalg.norm( [self.motionVec[vec_index][1], self.motionVec[vec_index][2]])
-                            mv2 = np.linalg.norm( [self.motionVec[vec_index][3], self.motionVec[vec_index][4]])
-                            if mv1 == 0.0 and mv2 == 0.0:
-                                Z = self.hvstables[int((abs(self.motionVec[vec_index][1])))][int((abs(self.motionVec[vec_index][2])))]
-                            else:
-                                Z = np.floor(((mv1/float(mv1+mv2))*Z1)+((mv2/float(mv1+mv2))*Z2))
+                            Z = self.hvstables[int((abs(self.motionVec[vec_index][1])+abs(self.motionVec[vec_index][3]))/2.)][int((abs(self.motionVec[vec_index][2])+abs(self.motionVec[vec_index][4]))/2.)]
                             
                         blk = h.zagzig(self.seqrec[i*cBLK + j])
                         #print rYmg[ch][r*i:r*i+r, c*j:c*j+c].shape, ch, i, j

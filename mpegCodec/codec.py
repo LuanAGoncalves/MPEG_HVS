@@ -296,59 +296,15 @@ class Encoder:
 
         return auxImage
         
-#    def genHVStables (self):
-#        """
-#        # MPEG Encoder: \n
-#        Method: genHVStables(self)-> tables \n
-#        About: Generates matrices of perceptual quantization. \n
-#        """
-#        min_value, max_value = self.Z.min(), self.Z.max()
-#        tables = [[0 for x in range (self.sspace+1)] for x in range (self.sspace+1)]
-#        g = [[0 for x in range (self.sspace+1)] for x in range (self.sspace+1)]
-#        qflat = self.flat*np.ones((8,8), float)
-#        for mh in range (self.sspace+1):
-#            for mt in range (self.sspace+1):
-#                vh = float(mh*self.fps)/float(self.oR)
-#                vt = float(mt*self.fps)/float(self.oC)
-#                v = sqrt(vh**2+vt**2)
-#                gaux = np.zeros((8,8), np.float32)
-#                const1 = float(mh*self.oR)/float(self.mbr*self.mbc)
-#                const2 = float(mt*self.oC)/float(self.mbr*self.mbc)
-#                if v != 0:
-#                    for i in range (8):
-#                        for j in range (8):
-#                            ai = const1*0.5*i
-#                            aj = const2*0.5*j
-#                            aij = ai + aj
-#                            gaux[i,j] = (6.1+7.3*abs(log(v/3.0))**3.0)*(v*(aij**2.0))*exp(-2.0*aij*(v+2.0)/45.9)
-#                    g[mh][mt] = gaux
-#                    
-#                else:
-#                    g[mh][mt] = gaux
-#                    
-#        g = np.array(g)
-#        gmax = np.max(g)
-#        for mh in range (self.sspace+1):
-#            for mt in range (self.sspace+1):
-#                qhvs = np.zeros((8,8), np.float32)
-#                for i in range (8):
-#                    for j in range (8):
-#                        qhvs[i,j] = ((mh+mt)/float(self.p))*(1.-(g[mh,mt,i,j]/gmax))
-#
-#                tables[mh][mt] = qflat + qhvs
-#                
-#        self.hvstables = tables
-        
     def genHVStables (self):
         """
         # MPEG Encoder: \n
         Method: genHVStables(self)-> tables \n
         About: Generates matrices of perceptual quantization. \n
         """
-        min_value, max_value = self.Z.min(), self.Z.max()
         tables = [[0 for x in range (self.sspace+1)] for x in range (self.sspace+1)]
         g = [[0 for x in range (self.sspace+1)] for x in range (self.sspace+1)]
-        qflat = min_value*np.ones((8,8), float)
+        qflat = self.flat*np.ones((8,8), float)
         for mh in range (self.sspace+1):
             for mt in range (self.sspace+1):
                 vh = float(mh*self.fps)/float(self.oR)
@@ -373,14 +329,58 @@ class Encoder:
         gmax = np.max(g)
         for mh in range (self.sspace+1):
             for mt in range (self.sspace+1):
-                qhvs = np.zeros((8,8), np.float32)
+                qhvs = np.zeros((8,8), float)
                 for i in range (8):
                     for j in range (8):
                         qhvs[i,j] = ((mh+mt)/float(self.p))*(1.-(g[mh,mt,i,j]/gmax))
-                q = (qflat + qhvs)
-                tables[mh][mt] = ((q/np.linalg.norm(q))*(max_value-min_value))+min_value
+
+                tables[mh][mt] = qflat + qhvs
                 
         self.hvstables = tables
+        
+#    def genHVStables (self):
+#        """
+#        # MPEG Encoder: \n
+#        Method: genHVStables(self)-> tables \n
+#        About: Generates matrices of perceptual quantization. \n
+#        """
+#        min_value, max_value = self.Z[0].min(), self.Z[0].max()
+#        tables = [[0 for x in range (self.sspace+1)] for x in range (self.sspace+1)]
+#        g = [[0 for x in range (self.sspace+1)] for x in range (self.sspace+1)]
+#        qflat = min_value*np.ones((8,8), float)
+#        for mh in range (self.sspace+1):
+#            for mt in range (self.sspace+1):
+#                vh = float(mh*self.fps)/float(self.oR)
+#                vt = float(mt*self.fps)/float(self.oC)
+#                v = sqrt(vh**2+vt**2)
+#                gaux = np.zeros((8,8), np.float32)
+#                const1 = float(mh*self.oR)/float(self.mbr*self.mbc)
+#                const2 = float(mt*self.oC)/float(self.mbr*self.mbc)
+#                if v != 0:
+#                    for i in range (8):
+#                        for j in range (8):
+#                            ai = const1*0.5*i
+#                            aj = const2*0.5*j
+#                            aij = ai + aj
+#                            gaux[i,j] = (6.1+7.3*abs(log(v/3.0))**3.0)*(v*(aij**2.0))*exp(-2.0*aij*(v+2.0)/45.9)
+#                    g[mh][mt] = gaux
+#                    
+#                else:
+#                    g[mh][mt] = gaux
+#                    
+#        g = np.array(g)
+#        gmax = np.max(g)
+#        for mh in range (self.sspace+1):
+#            for mt in range (self.sspace+1):
+#                qhvs = np.zeros((8,8), float)
+#                for i in range (8):
+#                    for j in range (8):
+#                        qhvs[i,j] = ((mh+mt)/float(self.p))*(1.-(g[mh,mt,i,j]/gmax))
+#                q = (qflat + qhvs)
+#                
+#                tables[mh][mt] = ((q/np.linalg.norm(q))*(max_value-min_value))+min_value
+#                
+#        self.hvstables = tables
         
     def run (self):
         '''
@@ -396,6 +396,8 @@ class Encoder:
         nBfr = 2
         gopsize = 6
         fP = 0
+        Z = self.Z
+        Z[:,:,0] = self.flat*np.ones((8,8), float)
         
         print '###################### Starting MPEG Encoder ######################'
     
@@ -427,7 +429,7 @@ class Encoder:
                 for j in range (vecsz):
                     if bframe.motionVec[j][1] == 'i':
                         if self.hvsqm == 1:
-                            MV[j] = ( int(np.floor((abs(bframe.motionVec[j][2])+abs(bframe.motionVec[j][4]))/2.)) , int(np.floor((abs(bframe.motionVec[j][3])+abs(bframe.motionVec[j][5]))/2.) ))
+                            MV[j] = (abs(bframe.motionVec[j][2]), abs(bframe.motionVec[j][3]), abs(bframe.motionVec[j][4]), abs(bframe.motionVec[j][5]))
                     else:
                         if self.hvsqm == 1:
                             MV[j] = ( abs(bframe.motionVec[j][2]), abs(bframe.motionVec[j][3]) )
@@ -440,7 +442,7 @@ class Encoder:
                     self.redundancy.append(1.-(1./encoder.CRate))
                     self.numBits += encoder.NumBits
                 else:
-                    encoder = jpeg.Encoder(bframe.bframe, self.quality, self.hufftables, self.Z, self.mode)
+                    encoder = jpeg.Encoder(bframe.bframe, self.quality, self.hufftables, Z, self.mode)
                     self.avgBits.append(encoder.avgBits)
                     self.CRate.append(encoder.CRate)
                     self.redundancy.append(1.-(1./encoder.CRate))
@@ -469,7 +471,7 @@ class Encoder:
                     self.redundancy.append(1.-(1./encoder.CRate))
                     self.numBits += encoder.NumBits
                 else:
-                    encoder = jpeg.Encoder(pframe.pframe, self.quality, self.hufftables, self.Z, self.mode)
+                    encoder = jpeg.Encoder(pframe.pframe, self.quality, self.hufftables, Z, self.mode)
                     self.avgBits.append(encoder.avgBits)
                     self.CRate.append(encoder.CRate)
                     self.redundancy.append(1.-(1./encoder.CRate))
@@ -931,62 +933,15 @@ class Decoder:
 
         return auxImage
         
-#    def genHVStables (self):
-#        """
-#        # MPEG Decoder: \n
-#        Method: genHVStables(self)-> tables \n
-#        About: Generates matrices of perceptual quantization. \n
-#        """
-#        min_value, min_value = self.Z.min(), self.Z.max()
-#        tables = [[0 for x in range (int(self.sspace)+1)] for x in range (int(self.sspace)+1)]
-#        g = [[0 for x in range (int(self.sspace)+1)] for x in range (int(self.sspace)+1)]
-#        qflat = float(self.flat)*np.ones((8,8), np.float32)
-##        print qflat
-#        for mh in range (int(self.sspace)+1):
-#            for mt in range (int(self.sspace)+1):
-#                
-#                vh = float(mh*float(self.fps))/float(self.shape[0])
-#                vt = float(mt*float(self.fps))/float(self.shape[1])
-#                v = sqrt(vh**2+vt**2)
-#                qhvs = np.zeros((8,8), float)
-#                gaux = np.zeros((8,8), float)
-#                const1 = float(mh*int(self.shape[0]))/float(int(self.MBR)*int(self.MBC))
-#                const2 = float(mt*int(self.shape[1]))/float(int(self.MBR)*int(self.MBC))
-#                if v != 0:
-#                    for i in range (8):
-#                        for j in range (8):
-#                            ai = const1*0.5*i
-#                            aj = const2*0.5*j
-#                            aij = ai + aj
-#                            gaux[i,j] = (6.1+7.3*abs(log(v/3.0))**3.0)*(v*(aij**2.0))*exp(-2.0*aij*(v+2.0)/45.9)
-#                    g[mh][mt] = gaux
-#                    
-#                else:
-#                    g[mh][mt] = gaux
-#                    
-#        g = np.array(g)
-#        gmax = np.max(g)
-#        for mh in range (int(self.sspace)+1):
-#            for mt in range (int(self.sspace)+1):
-#                qhvs = np.zeros((8,8), float)
-#                for i in range (8):
-#                    for j in range (8):
-#                        qhvs[i,j] = ((mh+mt)/float(self.p))*(1.-(g[mh,mt,i,j]/gmax))
-#                tables[mh][mt] = qflat + qhvs
-#                
-#        self.hvstables = tables
-        
     def genHVStables (self):
         """
         # MPEG Decoder: \n
         Method: genHVStables(self)-> tables \n
         About: Generates matrices of perceptual quantization. \n
         """
-        min_value, max_value = self.Z.min(), self.Z.max()
         tables = [[0 for x in range (int(self.sspace)+1)] for x in range (int(self.sspace)+1)]
         g = [[0 for x in range (int(self.sspace)+1)] for x in range (int(self.sspace)+1)]
-        qflat = float(min_value)*np.ones((8,8), np.float32)
-#        print qflat
+        qflat = float(self.flat)*np.ones((8,8), np.float32)
         for mh in range (int(self.sspace)+1):
             for mt in range (int(self.sspace)+1):
                 
@@ -1017,10 +972,56 @@ class Decoder:
                 for i in range (8):
                     for j in range (8):
                         qhvs[i,j] = ((mh+mt)/float(self.p))*(1.-(g[mh,mt,i,j]/gmax))
-                q = (qflat + qhvs)
-                tables[mh][mt] = ((q/np.linalg.norm(q))*(max_value-min_value))+min_value
+                tables[mh][mt] = qflat + qhvs
                 
         self.hvstables = tables
+        
+#    def genHVStables (self):
+#        """
+#        # MPEG Decoder: \n
+#        Method: genHVStables(self)-> tables \n
+#        About: Generates matrices of perceptual quantization. \n
+#        """
+#        min_value, max_value = self.Z[0].min(), self.Z[0].max()
+#        tables = [[0 for x in range (int(self.sspace)+1)] for x in range (int(self.sspace)+1)]
+#        g = [[0 for x in range (int(self.sspace)+1)] for x in range (int(self.sspace)+1)]
+#        qflat = min_value*np.ones((8,8), float)
+#        
+#        for mh in range (int(self.sspace)+1):
+#            for mt in range (int(self.sspace)+1):
+#                
+#                vh = float(mh*float(self.fps))/float(self.shape[0])
+#                vt = float(mt*float(self.fps))/float(self.shape[1])
+#                v = sqrt(vh**2+vt**2)
+#                qhvs = np.zeros((8,8), float)
+#                gaux = np.zeros((8,8), float)
+#                const1 = float(mh*int(self.shape[0]))/float(int(self.MBR)*int(self.MBC))
+#                const2 = float(mt*int(self.shape[1]))/float(int(self.MBR)*int(self.MBC))
+#                if v != 0:
+#                    for i in range (8):
+#                        for j in range (8):
+#                            ai = const1*0.5*i
+#                            aj = const2*0.5*j
+#                            aij = ai + aj
+#                            gaux[i,j] = (6.1+7.3*abs(log(v/3.0))**3.0)*(v*(aij**2.0))*exp(-2.0*aij*(v+2.0)/45.9)
+#                    g[mh][mt] = gaux
+#                    
+#                else:
+#                    g[mh][mt] = gaux
+#                    
+#        g = np.array(g)
+#        gmax = np.max(g)
+#        for mh in range (int(self.sspace)+1):
+#            for mt in range (int(self.sspace)+1):
+#                qhvs = np.zeros((8,8), float)
+#                for i in range (8):
+#                    for j in range (8):
+#                        qhvs[i,j] = ((mh+mt)/float(self.p))*(1.-(g[mh,mt,i,j]/gmax))
+#                q = (qflat + qhvs)
+#                
+#                tables[mh][mt] = ((q/np.linalg.norm(q))*(max_value-min_value))+min_value
+#                
+#        self.hvstables = tables
         
     def precover (self, pastfr, currentfr, motionVecs, sspace):
         '''
@@ -1120,6 +1121,8 @@ class Decoder:
         mb_type = {('00'):('I'), ('01'):('B'), ('10'):('P')}
         nl = self.shape[0] if self.shape[0]%16 == 0 else self.shape[0]+(self.shape[0]%16 - 16)
         ml = self.shape[1] if self.shape[1]%16 == 0 else self.shape[1]+(self.shape[1]%16 - 16)
+        Z = self.Z
+        Z[:,:,0] = 10.0*np.ones((8,8), float)
         while countfr < nauxfr:
             aux = fo[count]
             if mb_type[aux] == 'I':
@@ -1164,7 +1167,7 @@ class Decoder:
                 if self.hvsqm == 1:
                     sequence.append([countfr, jpeghvs.Decoder(ch, self.hufftables, self.hvstables, [self.shape, self.quality, self.mode, motionVec])._run_(), motionVec])
                 else:
-                    sequence.append([countfr, jpeg.Decoder(ch, self.hufftables, self.Z, [self.shape, self.quality, self.mode])._run_(), motionVec])
+                    sequence.append([countfr, jpeg.Decoder(ch, self.hufftables, Z, [self.shape, self.quality, self.mode])._run_(), motionVec])
                 count += 1
                 countfr += 1
             
@@ -1196,7 +1199,7 @@ class Decoder:
                 if self.hvsqm == 1:
                     sequence.append([countfr, jpeghvs.Decoder(ch, self.hufftables, self.hvstables, [self.shape, self.quality, self.mode, motionVec])._run_(), motionVec])
                 else:
-                    sequence.append([countfr, jpeg.Decoder(ch, self.hufftables, self.Z, [self.shape, self.quality, self.mode])._run_(), motionVec])
+                    sequence.append([countfr, jpeg.Decoder(ch, self.hufftables, Z, [self.shape, self.quality, self.mode])._run_(), motionVec])
                 count += 1
                 countfr += 1
             print 'Progress: %d/%d' % (countfr,nauxfr)

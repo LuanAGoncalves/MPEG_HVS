@@ -73,7 +73,10 @@ class Encoder:
                         coefs = cv2.dct(sbimg)
                 #    SELEÇÃO DA MATRIZ DE QUANTIZAÇÃO
                         vec_index = int(a*(self.nBlkCols/2)+b)
-                        Z = self.Zhvs[ int(abs(self.MV[vec_index][0])) ][ int(abs(self.MV[vec_index][1])) ] 
+                        if len(self.MV[vec_index]) == 2:
+                            Z = self.Zhvs[ int(abs(self.MV[vec_index][0])) ][ int(abs(self.MV[vec_index][1])) ] 
+                        elif len(self.MV[vec_index]) == 4:
+                            Z = self.Zhvs[ int((abs(self.MV[vec_index][0])+abs(self.MV[vec_index][2]))/2.) ][ int((abs(self.MV[vec_index][1])+abs(self.MV[vec_index][3]))/2.) ] 
                 #    QUANTIZAÇÃO/LIMIARIZAÇÃO
                         zcoefs = np.round( coefs/Z )      #Coeficientes normalizados - ^T(u,v)=arred{T(u,v)/Z(u,v)}
                 #    CODIFICAÇÃO - Codigos de Huffman
@@ -127,7 +130,10 @@ class Encoder:
                             vec_index = int(a*(self.nBlkCols/2)+b)
                         else:       #CROMINANCIA
                             vec_index = int(a*(self.nBlkCols/2)+b)
-                        Z = self.Zhvs[ int(abs(self.MV[vec_index][0])) ][ int(abs(self.MV[vec_index][1])) ] 
+                        if len(self.MV[vec_index]) == 2:
+                            Z = self.Zhvs[ int(abs(self.MV[vec_index][0])) ][ int(abs(self.MV[vec_index][1])) ] 
+                        elif len(self.MV[vec_index]) == 4:
+                            Z = self.Zhvs[ int((abs(self.MV[vec_index][0])+abs(self.MV[vec_index][2]))/2.) ][ int((abs(self.MV[vec_index][1])+abs(self.MV[vec_index][3]))/2.) ] 
                 #    QUANTIZAÇÃO/LIMIARIZAÇÃO
                         zcoefs = np.round( coefs/Z )      #Coeficientes normalizados - ^T(u,v)=arred{T(u,v)/Z(u,v)}
                 #    CODIFICAÇÃO - Codigos de Huffman - FOWARD HUFF

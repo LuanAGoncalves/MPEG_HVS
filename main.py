@@ -12,7 +12,6 @@ from Tkinter import Tk
 from tkFileDialog import askopenfilename
 import sys
 import numpy as np
-import cv2
 import os
 
 root = Tk()
@@ -38,8 +37,8 @@ if __name__ == "__main__":
     quality = range (0,110,10)    # Compression quality.
     sspace = 15    # Search space.
     search = 1        # 0 - Full search; 1 - Parallel hierarchical.
-    flat = 10.0    # Qflat value.
-    p = 2.0        # Parameter p.
+    flat = 16.0    # Qflat value.
+    p = 1.0        # Parameter p.
     mode = '420'       # 444 or 420
     hvsqm = [0, 1]       # Normal or HVS based method
     mpeg_avgBits, mpeg_CRate, mpeg_redundancy, mpeg_kbps = [], [], [], []

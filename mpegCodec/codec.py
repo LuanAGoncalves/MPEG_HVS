@@ -341,54 +341,6 @@ class Encoder:
                 
         self.hvstables = tables
         
-#    def genHVStables (self):
-#        """
-#        # MPEG Encoder: \n
-#        Method: genHVStables(self)-> tables \n
-#        About: Generates matrices of perceptual quantization. \n
-#        """
-#        if self.quality <= 70:
-#            max_value = self.Z.max()
-#        else:
-#            max_value = 119.9
-#        tables = [[0 for x in range (self.sspace+1)] for x in range (self.sspace+1)]
-#        g = [[0 for x in range (self.sspace+1)] for x in range (self.sspace+1)]
-#        min_value = 10.6577596664+234.260803223*0.859902977943**(self.quality)
-#        qflat = min_value*np.ones((8,8), float)
-#        for mh in range (self.sspace+1):
-#            for mt in range (self.sspace+1):
-#                vh = float(mh*self.fps)/float(self.oR)
-#                vt = float(mt*self.fps)/float(self.oC)
-#                v = sqrt(vh**2+vt**2)
-#                gaux = np.zeros((8,8), np.float32)
-#                const1 = float(mh*self.oR)/float(self.mbr*self.mbc)
-#                const2 = float(mt*self.oC)/float(self.mbr*self.mbc)
-#                if v != 0:
-#                    for i in range (8):
-#                        for j in range (8):
-#                            ai = const1*0.5*i
-#                            aj = const2*0.5*j
-#                            aij = ai + aj
-#                            gaux[i,j] = (6.1+7.3*abs(log(v/3.0))**3.0)*(v*(aij**2.0))*exp(-2.0*aij*(v+2.0)/45.9)
-#                    g[mh][mt] = gaux
-#                    
-#                else:
-#                    g[mh][mt] = gaux
-#                    
-#        g = np.array(g)
-#        gmax = np.max(g)
-#        for mh in range (self.sspace+1):
-#            for mt in range (self.sspace+1):
-#                qhvs = np.zeros((8,8), np.float32)
-#                for i in range (8):
-#                    for j in range (8):
-#                        qhvs[i,j] = ((mh+mt)/float(self.p))*(1.-(g[mh,mt,i,j]/gmax))
-#                q = (qflat + qhvs)
-#                tables[mh][mt] = ((q/np.linalg.norm(q))*(max_value-min_value))+min_value
-##                tables[mh][mt] = q
-#                
-#        self.hvstables = tables
-        
     def run (self):
         '''
         # MPEG Encoder: \n
@@ -686,14 +638,14 @@ class Encoder:
         '''
     
         fact = qualy
-        Z = np.array([[[16., 17., 17.], [11., 18., 18.], [10., 24., 24.], [16., 47., 47.], [124., 99., 99.], [140., 99., 99.], [151., 99., 99.], [161., 99., 99.]],
-                  [[12., 18., 18.], [12., 21., 21.], [14., 26., 26.], [19., 66., 66.], [ 26., 99., 99.], [158., 99., 99.], [160., 99., 99.], [155., 99., 99.]],
-                  [[14., 24., 24.], [13., 26., 26.], [16., 56., 56.], [24., 99., 99.], [ 40., 99., 99.], [157., 99., 99.], [169., 99., 99.], [156., 99., 99.]],
-                  [[14., 47., 47.], [17., 66., 66.], [22., 99., 99.], [29., 99., 99.], [ 51., 99., 99.], [187., 99., 99.], [180., 99., 99.], [162., 99., 99.]],
-                  [[18., 99., 99.], [22., 99., 99.], [37., 99., 99.], [56., 99., 99.], [ 68., 99., 99.], [109., 99., 99.], [103., 99., 99.], [177., 99., 99.]],
-                  [[24., 99., 99.], [35., 99., 99.], [55., 99., 99.], [64., 99., 99.], [ 81., 99., 99.], [104., 99., 99.], [113., 99., 99.], [192., 99., 99.]],
-                  [[49., 99., 99.], [64., 99., 99.], [78., 99., 99.], [87., 99., 99.], [103., 99., 99.], [121., 99., 99.], [120., 99., 99.], [101., 99., 99.]],
-                  [[72., 99., 99.], [92., 99., 99.], [95., 99., 99.], [98., 99., 99.], [112., 99., 99.], [100., 99., 99.], [103., 99., 99.], [199., 99., 99.]]])
+        Z = np.array([[[8., 17., 17.], [16., 18., 18.], [19., 24., 24.], [22., 47., 47.], [26., 99., 99.], [27., 99., 99.], [29., 99., 99.], [34., 99., 99.]],
+                  [[16., 18., 18.], [16., 21., 21.], [22., 26., 26.], [24., 66., 66.], [ 27., 99., 99.], [29., 99., 99.], [34., 99., 99.], [37., 99., 99.]],
+                  [[19., 24., 24.], [22., 26., 26.], [26., 56., 56.], [27., 99., 99.], [ 29., 99., 99.], [34., 99., 99.], [34., 99., 99.], [38., 99., 99.]],
+                  [[22., 47., 47.], [22., 66., 66.], [26., 99., 99.], [27., 99., 99.], [ 29., 99., 99.], [34., 99., 99.], [37., 99., 99.], [40., 99., 99.]],
+                  [[22., 99., 99.], [26., 99., 99.], [27., 99., 99.], [29., 99., 99.], [ 32., 99., 99.], [35., 99., 99.], [40., 99., 99.], [48., 99., 99.]],
+                  [[26., 99., 99.], [27., 99., 99.], [29., 99., 99.], [32., 99., 99.], [ 35., 99., 99.], [40., 99., 99.], [48., 99., 99.], [58., 99., 99.]],
+                  [[26., 99., 99.], [27., 99., 99.], [29., 99., 99.], [34., 99., 99.], [38., 99., 99.], [46., 99., 99.], [56., 99., 99.], [69., 99., 99.]],
+                  [[27., 99., 99.], [29., 99., 99.], [35., 99., 99.], [38., 99., 99.], [46., 99., 99.], [56., 99., 99.], [69., 99., 99.], [83., 99., 99.]]])
                   
         if qualy < 1 : fact = 1
         if qualy > 99: fact = 99
@@ -981,57 +933,6 @@ class Decoder:
                 tables[mh][mt] = qflat + qhvs
                 
         self.hvstables = tables
-        
-#    def genHVStables (self):
-#        """
-#        # MPEG Decoder: \n
-#        Method: genHVStables(self)-> tables \n
-#        About: Generates matrices of perceptual quantization. \n
-#        """
-#        if self.quality <= 70:
-#            max_value = self.Z.max()
-#        else:
-#            max_value = 119.9
-#        tables = [[0 for x in range (int(self.sspace)+1)] for x in range (int(self.sspace)+1)]
-#        g = [[0 for x in range (int(self.sspace)+1)] for x in range (int(self.sspace)+1)]
-#        min_value = 10.6577596664+234.260803223*0.859902977943**(self.quality)
-#        qflat = min_value*np.ones((8,8), float)
-##        print qflat
-#        for mh in range (int(self.sspace)+1):
-#            for mt in range (int(self.sspace)+1):
-#                
-#                vh = float(mh*float(self.fps))/float(self.shape[0])
-#                vt = float(mt*float(self.fps))/float(self.shape[1])
-#                v = sqrt(vh**2+vt**2)
-#                qhvs = np.zeros((8,8), float)
-#                gaux = np.zeros((8,8), float)
-#                const1 = float(mh*int(self.shape[0]))/float(int(self.MBR)*int(self.MBC))
-#                const2 = float(mt*int(self.shape[1]))/float(int(self.MBR)*int(self.MBC))
-#                if v != 0:
-#                    for i in range (8):
-#                        for j in range (8):
-#                            ai = const1*0.5*i
-#                            aj = const2*0.5*j
-#                            aij = ai + aj
-#                            gaux[i,j] = (6.1+7.3*abs(log(v/3.0))**3.0)*(v*(aij**2.0))*exp(-2.0*aij*(v+2.0)/45.9)
-#                    g[mh][mt] = gaux
-#                    
-#                else:
-#                    g[mh][mt] = gaux
-#                    
-#        g = np.array(g)
-#        gmax = np.max(g)
-#        for mh in range (int(self.sspace)+1):
-#            for mt in range (int(self.sspace)+1):
-#                qhvs = np.zeros((8,8), float)
-#                for i in range (8):
-#                    for j in range (8):
-#                        qhvs[i,j] = ((mh+mt)/float(self.p))*(1.-(g[mh,mt,i,j]/gmax))
-#                q = (qflat + qhvs)
-#                tables[mh][mt] = ((q/np.linalg.norm(q))*(max_value-min_value))+min_value
-##                tables[mh][mt] = q
-#                
-#        self.hvstables = tables
         
     def precover (self, pastfr, currentfr, motionVecs, sspace):
         '''
